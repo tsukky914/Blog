@@ -1,8 +1,10 @@
 class ArticlesController < ApplicationController
+  before_action :authenticate_user!
   before_action :find_article, only: [:show, :edit, :update, :destroy]
+  before_action :validate_user, only: [:show, :edit, :update, :destroy]
   
   def index
-    @articles = Article.order(created_at: :desc)
+    @articles = current_user.articles.order(created_at: :desc)
   end
 
   def show
@@ -17,14 +19,17 @@ class ArticlesController < ApplicationController
   end
   
   def create
-    @article = Article.new(article_params)
-    if @article.save
-      redirect_to @article, notice: '作成に成功しました'
-    else
-      render :new, alert: '作成できませんでした'
+    Article.transaction do
+      @article = Article.new(article_params)
+      @article.user_id = current_user.id
+      if @article.save!
+        redirect_to @article, notice: '作成に成功しました'
+      else
+        render :new, alert: '作成できませんでした'
+      end
     end
   end
-
+  
   def update
     if @article.update(article_params)
       redirect_to @article, notice: '更新に成功しました'
@@ -47,6 +52,12 @@ class ArticlesController < ApplicationController
   end
   
   def article_params
-    params.required(:article).permit(:title, :body)
+    params.required(:article).permit(:title, :body, :image)
+  end
+  
+  def validate_user
+    if @article.user != current_user
+      redirect_to root_path, alert:"閲覧権限がありません。"
+    end
   end
 end
