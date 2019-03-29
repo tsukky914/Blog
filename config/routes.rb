@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
-  devise_for :users
-  # get 'articles/index'
-  # get 'articles/show'
-  # get 'articles/edit'
-  # get 'articles/new'
+
+  devise_for :users, :controllers => {
+   :registrations => 'users/registrations',
+   :sessions => 'users/sessions'
+  }
   
   resources :articles
   root 'articles#index'

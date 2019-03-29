@@ -7,7 +7,7 @@
         <span class="icon-bar"></span>
       </button>
       <% if user_signed_in? %>
-        <a class="navbar-brand" href="/">Blog</a>
+        <a class="navbar-brand" href="/"><%= current_user.profile.name %>'s Blog</a>
       <% else %>
         <a class="navbar-brand" href="/">Blogs not signed in </a>
       <% end %>
